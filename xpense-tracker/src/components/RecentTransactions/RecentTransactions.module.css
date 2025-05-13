@@ -1,0 +1,40 @@
+
+.wrapper {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+}
+
+.transactions_box {
+    background-color: white;
+    height: 390px;
+    width: 100%;
+    border-radius: 10px;
+    padding: 10px 20px;
+    box-shadow: 0 4px 4px rgba(0, 0, 0, 0.2);
+}
+
+.transaction {
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 1px solid gray;
+}
+
+
+.heading {
+    align-self: center;
+}
+
+
+
+@media (min-width: 1147px) {
+    .wrapper {
+        display: block;
+    }
+}
+
+@media (min-width: 900px) {
+    .heading {
+        align-self: start;
+    }
+}
