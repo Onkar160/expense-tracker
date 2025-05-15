@@ -31,9 +31,9 @@ export default function Modal({ open, type, setOpen, transactionID }) {
       });
       return;
     }
-    if (oldAmount + Number(walletAmount) < expenses) {
+    if (Number(walletAmount) < 0) {
       enqueueSnackbar(
-        "The amount you are trying to add is lower than your expenses, please add more amount than expenses or lower your expenses",
+        "Income should be greater than 0",
         {
           variant: "warning",
           anchorOrigin: {
@@ -168,7 +168,7 @@ function ExpenseModal({
 }) {
   const [expenseData, setExpenseData] = useState({
     title: "",
-    amount: "",
+    price: "",
     category: "",
     date: "",
   });
@@ -186,7 +186,7 @@ function ExpenseModal({
       // console.log(aTransaction);
       setExpenseData({
         title: aTransaction.title,
-        amount: aTransaction.amount,
+        price: aTransaction.price,
         category: aTransaction.category,
         date: aTransaction.date,
       });
@@ -200,10 +200,10 @@ function ExpenseModal({
         return transaction;
       }
     });
-    let oldAmount = Number(oldTransaction.amount);
-    let newAmount = Number(expenseData.amount);
+    let oldAmount = Number(oldTransaction.price);
+    let newAmount = Number(expenseData.price);
     if (
-      oldTransaction.amount === expenseData.amount &&
+      oldTransaction.price === expenseData.price &&
       oldTransaction.title === expenseData.title &&
       oldTransaction.date === expenseData.data &&
       oldTransaction.category === expenseData.category
@@ -231,7 +231,7 @@ function ExpenseModal({
     const editedTransactions = transactions.map((transaction) => {
       if (transaction.id === transactionID) {
         transaction.title = expenseData.title;
-        transaction.amount = expenseData.amount;
+        transaction.price = expenseData.price;
         transaction.category = expenseData.category;
         transaction.date = expenseData.date;
       }
@@ -240,7 +240,7 @@ function ExpenseModal({
 
     localStorage.setItem("walletBalance", updatedBalance);
     let currentBalance = Number(localStorage.getItem("walletBalance"));
-    currentBalance -= Number(expenseData.amount);
+    currentBalance -= Number(expenseData.price);
     localStorage.setItem("walletBalance", currentBalance);
     setWalletBalance(currentBalance);
     setTransactions(editedTransactions);
@@ -261,7 +261,7 @@ function ExpenseModal({
   };
 
   const addExpense = () => {
-    if (parseInt(expenseData.amount) > parseInt(walletBalance)) {
+    if (parseInt(expenseData.price) > parseInt(walletBalance)) {
       enqueueSnackbar(
         "Your expenses amount is more than wallet balance. Please lower the amount and try again",
         {
@@ -276,11 +276,11 @@ function ExpenseModal({
     }
 
     let currentBalance = Number(localStorage.getItem("walletBalance"));
-    currentBalance -= Number(expenseData.amount);
+    currentBalance -= Number(expenseData.price);
     localStorage.setItem("walletBalance", currentBalance);
 
     setWalletBalance((prevBalance) => {
-      return prevBalance - Number(expenseData.amount);
+      return prevBalance - Number(expenseData.price);
     });
 
     setTransactions((prevData) => {
@@ -328,9 +328,9 @@ function ExpenseModal({
               boxShadow: "0 4px 4px rgba(0, 0, 0, 0.2)",
               width: "50%",
             }}
-            name="amount"
+            name="price"
             onChange={handleChange}
-            value={expenseData.amount}
+            value={expenseData.price}
             required
           />
         </div>

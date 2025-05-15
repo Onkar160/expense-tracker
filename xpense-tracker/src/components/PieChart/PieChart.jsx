@@ -56,7 +56,7 @@ export default function CustomPieChart() {
 
     transactions.forEach((transaction) => {
       const categoryKey = transaction.category.toLowerCase();
-      const amount = Number(transaction.amount) || 0;
+      const amount = Number(transaction.price) || 0;
       if (categoryMap.hasOwnProperty(categoryKey)) {
         categoryMap[categoryKey] += amount;
       }

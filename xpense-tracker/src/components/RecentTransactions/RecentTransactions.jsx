@@ -47,7 +47,7 @@ export default function RecentTransaction() {
       if (id !== item.id) {
         return item;
       } else {
-        transactionAmount += Number(item.amount);
+        transactionAmount += Number(item.price);
       }
     });
 
@@ -123,7 +123,7 @@ export default function RecentTransaction() {
                     }}
                   >
                     <h3 style={{ color: "#F4BB4A", marginRight: "20px" }}>
-                      ₹{transaction.amount}
+                      ₹{transaction.price}
                     </h3>
                     <button
                       style={{

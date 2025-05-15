@@ -55,7 +55,7 @@ export default function HomePage() {
   useEffect(() => {
     if (transactions.length) {
       let expenseAmount = transactions.reduce((acc, curr) => {
-        let amount = parseInt(curr.amount);
+        let amount = parseInt(curr.price);
         return acc + amount;
       }, 0);
       // console.log(expenseAmount);

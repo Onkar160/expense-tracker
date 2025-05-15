@@ -27,7 +27,7 @@ export default function AnimatedHorizontalBarChart() {
     transactions.forEach((transaction) => {
       const categoryKey = transaction.category.toLowerCase();
       if (categoryMap.hasOwnProperty(categoryKey)) {
-        categoryMap[categoryKey] += Number(transaction.amount) || 0;
+        categoryMap[categoryKey] += Number(transaction.price) || 0;
       }
     });
 
