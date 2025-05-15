@@ -11,7 +11,7 @@ export default function SectionExpenseTracker() {
 
   return (
     <div className={styles.wrapper}>
-      <h1 id={styles.heading}>Expense Tracker</h1>
+      <h1 className={styles.heading}>Expense Tracker</h1>
       <div className={styles.expense_wrapper}>
         <AmountSection type={"Wallet Balance"} amount={walletBalance} />
         <AmountSection type={"Expenses"} amount={expenses} />
