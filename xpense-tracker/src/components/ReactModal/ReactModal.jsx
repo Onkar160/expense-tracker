@@ -1,5 +1,5 @@
 import ReactModal from "react-modal";
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import { Transactions } from "../Context";
 import { useSnackbar } from "notistack";
 import { v4 as uuidv4 } from "uuid";
@@ -18,7 +18,8 @@ export default function Modal({ open, type, setOpen, transactionID }) {
   };
 
   const updateWalletBalance = () => {
-    if (walletAmount >= 100000000) {
+    const oldAmount = Number(localStorage.getItem("walletBalance"));
+    if (oldAmount + walletAmount >= 100000000) {
       enqueueSnackbar("Cannot add amount more than 100000000", {
         variant: "warning",
         anchorOrigin: {
@@ -28,7 +29,7 @@ export default function Modal({ open, type, setOpen, transactionID }) {
       });
       return;
     }
-    if (walletAmount < expenses) {
+    if (oldAmount + walletAmount < expenses) {
       enqueueSnackbar(
         "The amount you are trying to add is lower than your expenses, please add more amount than expenses or lower your expenses",
         {
@@ -41,8 +42,8 @@ export default function Modal({ open, type, setOpen, transactionID }) {
       );
       return;
     }
-    localStorage.setItem("walletBalance", walletAmount);
-    setWalletBalance(walletAmount);
+    localStorage.setItem("walletBalance", oldAmount + Number(walletAmount));
+    setWalletBalance(oldAmount + Number(walletAmount));
     setWalletAmount("");
     setOpen(false);
   };
@@ -161,55 +162,80 @@ function ExpenseModal({
     date: "",
   });
 
+  const { transactions, setTransactions } = useContext(Transactions);
+  // console.log(transactions);
+
+  useEffect(() => {
+    if (transactionID.length) {
+      const aTransaction = transactions.find((transaction) => {
+        if (transaction.id === transactionID) {
+          return transaction;
+        }
+      });
+      // console.log(aTransaction);
+      setExpenseData({
+        title: aTransaction.title,
+        amount: aTransaction.amount,
+        category: aTransaction.category,
+        date: aTransaction.date,
+      });
+    }
+  }, []);
+
   const editTransaction = (transactionID) => {
+    // console.log(transactionID);
+    let oldTransaction = transactions.find((transaction) => {
+      if (transaction.id === transactionID) {
+        return transaction;
+      }
+    });
+    let oldAmount = Number(oldTransaction.amount);
+    let newAmount = Number(expenseData.amount);
+    if (
+      oldTransaction.amount === expenseData.amount &&
+      oldTransaction.title === expenseData.title &&
+      oldTransaction.date === expenseData.data &&
+      oldTransaction.category === expenseData.category
+    ) {
+      setOpen(false);
+      return;
+    }
+    // console.log(oldTransactionAmount);
+    let updatedBalance =
+      Number(localStorage.getItem("walletBalance")) + oldAmount;
+
+    if (newAmount > updatedBalance) {
+      enqueueSnackbar(
+        "Your expenses amount is more than wallet balance. Please lower the amount and try again",
+        {
+          variant: "warning",
+          anchorOrigin: {
+            vertical: "bottom",
+            horizontal: "center",
+          },
+        }
+      );
+      return;
+    }
     const editedTransactions = transactions.map((transaction) => {
       if (transaction.id === transactionID) {
-        if (
-          !expenseData.title ||
-          !expenseData.amount ||
-          !expenseData.category ||
-          !expenseData.date
-        ) {
-          enqueueSnackbar(
-            "All fields are important, please fill them before adding",
-            {
-              variant: "warning",
-              anchorOrigin: {
-                vertical: "bottom",
-                horizontal: "center",
-              },
-            }
-          );
-          return;
-        }
-        if (
-          parseInt(expenseData.amount) > parseInt(walletBalance) ||
-          parseInt(expenses) + parseInt(expenseData.amount) >
-            parseInt(walletBalance)
-        ) {
-          enqueueSnackbar(
-            "Your expense amount is more than wallet balance. Please lower the amount and try again",
-            {
-              variant: "warning",
-              anchorOrigin: {
-                vertical: "bottom",
-                horizontal: "center",
-              },
-            }
-          );
-          return;
-        }
         transaction.title = expenseData.title;
         transaction.amount = expenseData.amount;
         transaction.category = expenseData.category;
         transaction.date = expenseData.date;
       }
-      console.log(editedTransactions);
+      return transaction;
     });
-  };
 
-  const { transactions, setTransactions } = useContext(Transactions);
-  // console.log(transactions);
+    localStorage.setItem("walletBalance", updatedBalance);
+    let currentBalance = Number(localStorage.getItem("walletBalance"));
+    currentBalance -= Number(expenseData.amount);
+    localStorage.setItem("walletBalance", currentBalance);
+    setWalletBalance(currentBalance);
+    setTransactions(editedTransactions);
+    setOpen(false);
+    // console.log(editedTransactions);
+  };
 
   const handleChange = (e) => {
     // console.log(e.target.value);
@@ -224,14 +250,9 @@ function ExpenseModal({
   };
 
   const addExpense = () => {
-    if (
-      !expenseData.title ||
-      !expenseData.amount ||
-      !expenseData.category ||
-      !expenseData.date
-    ) {
+    if (parseInt(expenseData.amount) > parseInt(walletBalance)) {
       enqueueSnackbar(
-        "All fields are important, please fill them before adding",
+        "Your expenses amount is more than wallet balance. Please lower the amount and try again",
         {
           variant: "warning",
           anchorOrigin: {
@@ -242,23 +263,10 @@ function ExpenseModal({
       );
       return;
     }
-    if (
-      parseInt(expenseData.amount) > parseInt(walletBalance) ||
-      parseInt(expenses) + parseInt(expenseData.amount) >
-        parseInt(walletBalance)
-    ) {
-      enqueueSnackbar(
-        "Your expense amount is more than wallet balance. Please lower the amount and try again",
-        {
-          variant: "warning",
-          anchorOrigin: {
-            vertical: "bottom",
-            horizontal: "center",
-          },
-        }
-      );
-      return;
-    }
+
+    let currentBalance = Number(localStorage.getItem("walletBalance"));
+    currentBalance -= Number(expenseData.amount);
+    localStorage.setItem("walletBalance", currentBalance);
 
     setWalletBalance((prevBalance) => {
       return prevBalance - Number(expenseData.amount);
@@ -272,7 +280,13 @@ function ExpenseModal({
   };
 
   return (
-    <div style={{ textAlign: "start", width: "100%" }}>
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        transactionID.length ? editTransaction(transactionID) : addExpense();
+      }}
+      style={{ textAlign: "start", width: "100%" }}
+    >
       <h1 style={{ marginTop: "0" }}>
         {transactionID.length ? "Edit Expenses" : "Add Expenses"}
       </h1>
@@ -289,7 +303,9 @@ function ExpenseModal({
               width: "50%",
             }}
             name="title"
+            value={expenseData.title}
             onChange={handleChange}
+            required
           />
           <input
             type="number"
@@ -303,12 +319,14 @@ function ExpenseModal({
             }}
             name="amount"
             onChange={handleChange}
+            value={expenseData.amount}
+            required
           />
         </div>
         <div style={{ display: "flex", gap: "15px" }}>
           <select
             name="category"
-            defaultValue=""
+            value={expenseData.category}
             style={{
               WebkitAppearance: "none",
               MozAppearance: "none",
@@ -320,6 +338,7 @@ function ExpenseModal({
               width: "50%",
               color: "gray",
             }}
+            required
             onChange={handleChange}
           >
             <option value="" disabled>
@@ -341,10 +360,13 @@ function ExpenseModal({
             }}
             name="date"
             onChange={handleChange}
+            value={expenseData.date}
+            required
           />
         </div>
         <div style={{ display: "flex", gap: "15px" }}>
           <button
+            type="submit"
             style={{
               borderRadius: "15px",
               border: "none",
@@ -356,15 +378,11 @@ function ExpenseModal({
               fontWeight: "600",
               width: "50%",
             }}
-            onClick={() =>
-              transactionID.length
-                ? editTransaction(transactionID)
-                : addExpense()
-            }
           >
             Add Expense
           </button>
           <button
+            type="button"
             onClick={() => setOpen(false)}
             style={{
               borderRadius: "15px",
@@ -380,6 +398,6 @@ function ExpenseModal({
           </button>
         </div>
       </div>
-    </div>
+    </form>
   );
 }

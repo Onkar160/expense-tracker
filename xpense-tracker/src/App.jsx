@@ -3,6 +3,8 @@ import { SnackbarProvider } from "notistack";
 import { Transactions } from "./components/Context";
 import { useState, useEffect } from "react";
 import RecentTransaction from "./components/RecentTransactions/RecentTransactions";
+import BarChartSection from "./components/BarChartSection/BarChartSection";
+import styles from "./App.module.css";
 
 function App() {
   const [walletBalance, setWalletBalance] = useState(0);
@@ -49,8 +51,6 @@ function App() {
     localStorage.setItem("transactions", JSON.stringify(transactions));
   }, [transactions]);
 
-  
-
   //For updating the total expenses price according to the transaction list change
   useEffect(() => {
     if(transactions.length) {
@@ -59,6 +59,7 @@ function App() {
         return acc + amount;
       }, 0);
       // console.log(expenseAmount);
+      localStorage.setItem("expenses", expenseAmount);
       setExpenses(expenseAmount);
     }
   }, [transactions])
@@ -66,9 +67,16 @@ function App() {
   return (
     <Transactions.Provider value={{ transactions, setTransactions, walletBalance, setWalletBalance, expenses, setExpenses }}>
       <SnackbarProvider maxSnack={3}>
-        <div style={{ padding: "20px", width: "100vw" }}>
+        <div className={styles.wrapper}>
           <SectionExpenseTracker />
-          <RecentTransaction />
+          <div className={styles.box}>
+            <RecentTransaction />
+            <div className={styles.bar_chart}>
+              <BarChartSection />
+            </div>
+            
+          </div>
+          
         </div>
       </SnackbarProvider>
     </Transactions.Provider>

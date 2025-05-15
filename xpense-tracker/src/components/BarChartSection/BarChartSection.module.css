@@ -1,0 +1,20 @@
+.wrapper {
+    color: white;
+}
+
+.chart_box {
+    width: 100%;
+}
+
+.heading {
+    font-style: italic;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+
+@media (min-width: 900px) {
+    .heading {
+        text-align: start;
+    }
+}

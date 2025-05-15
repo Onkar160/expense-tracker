@@ -3,7 +3,6 @@ import { useState, useContext, useEffect } from "react";
 import { Transactions } from "../Context";
 import { RxCrossCircled } from "react-icons/rx";
 import { MdOutlineEdit } from "react-icons/md";
-import { PiPizzaLight } from "react-icons/pi";
 import EntertainmentIcon from "../../assets/entertainment.svg";
 import FoodIcon from "../../assets/food.svg";
 import TravelIcon from "../../assets/travel.svg";
@@ -11,15 +10,55 @@ import { useSnackbar } from "notistack";
 import Modal from "../ReactModal/ReactModal";
 
 export default function RecentTransaction() {
-  const { transactions, setTransactions } = useContext(Transactions);
+  const {
+    transactions,
+    setTransactions,
+    walletBalance,
+    expenses,
+    setWalletBalance,
+    setExpenses,
+  } = useContext(Transactions);
   const [isOpen, setOpen] = useState(false);
   const { enqueueSnackbar } = useSnackbar();
-  const { walletBalance, expenses } = useContext(Transactions);
+
+  const [selectedTransactionID, setSelectedTransactionID] = useState(null);
 
   //   useEffect(() => {
   //     console.log(transactions);
   //     console.log(walletBalance, expenses);
   //   }, [transactions, walletBalance, expenses]);
+
+  const deleteTransaction = (id) => {
+    let transactionAmount = 0;
+    const newTransactions = transactions.filter((item) => {
+      if (id !== item.id) {
+        return item;
+      } else {
+        transactionAmount += Number(item.amount);
+      }
+    });
+    let currentBalance = Number(localStorage.getItem("walletBalance"));
+    let currentExpense = Number(localStorage.getItem("expenses"));
+
+    // console.log(currentBalance);
+    currentExpense -= transactionAmount;
+    currentBalance += transactionAmount;
+    localStorage.setItem("walletBalance", currentBalance);
+    localStorage.setItem("expenses", currentExpense);
+
+    setExpenses(currentExpense);
+    setWalletBalance(currentBalance);
+    setTransactions(newTransactions);
+  };
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString("en-US", {
+      month: "long",
+      day: "numeric",
+      year: "numeric",
+    });
+  };
 
   return (
     <div className={styles.wrapper}>
@@ -43,10 +82,19 @@ export default function RecentTransaction() {
                     alignItems: "center",
                   }}
                 >
-                  <img src={FoodIcon} />
+                  {transaction.category === "food" && <img src={FoodIcon} />}
+                  {transaction.category === "entertainment" && (
+                    <img src={EntertainmentIcon} />
+                  )}
+                  {transaction.category === "travel" && (
+                    <img src={TravelIcon} />
+                  )}
+
                   <div>
                     <p style={{ margin: "0" }}>{transaction.title}</p>
-                    <p style={{ margin: "0", color: "gray" }}>{transaction.date}</p>
+                    <p style={{ margin: "0", color: "gray" }}>
+                      {formatDate(transaction.date)}
+                    </p>
                   </div>
                 </div>
                 <div
@@ -70,6 +118,7 @@ export default function RecentTransaction() {
                       height: "min-content",
                       cursor: "pointer",
                     }}
+                    onClick={() => deleteTransaction(transaction.id)}
                   >
                     <RxCrossCircled size={30} color="white" />
                   </button>
@@ -83,10 +132,12 @@ export default function RecentTransaction() {
                       height: "min-content",
                       cursor: "pointer",
                     }}
-                    onClick={() => setOpen(!isOpen)}
+                    onClick={() => {
+                      setOpen(!isOpen);
+                      setSelectedTransactionID(transaction.id);
+                    }}
                   >
                     <MdOutlineEdit size={30} color="white" />
-                    
                   </button>
                 </div>
               </div>
@@ -98,6 +149,14 @@ export default function RecentTransaction() {
           </div>
         )}
       </div>
+      {selectedTransactionID && (
+        <Modal
+          open={isOpen}
+          type={"Expenses"}
+          setOpen={setOpen}
+          transactionID={selectedTransactionID}
+        />
+      )}
     </div>
   );
 }
