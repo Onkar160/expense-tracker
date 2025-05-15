@@ -76,12 +76,12 @@ export default function RecentTransaction() {
 
   return (
     <div className={styles.wrapper}>
-      <h1
+      <h2
         style={{ fontStyle: "italic", color: "white", marginBottom: "10px" }}
         className={styles.heading}
       >
         Recent Transactions
-      </h1>
+      </h2>
 
       <div className={styles.transactions_box}>
         <div>
