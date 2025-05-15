@@ -19,7 +19,9 @@ export default function Modal({ open, type, setOpen, transactionID }) {
 
   const updateWalletBalance = () => {
     const oldAmount = Number(localStorage.getItem("walletBalance"));
-    if (oldAmount + walletAmount >= 100000000) {
+    // console.log(typeof oldAmount);
+    // console.log(typeof walletAmount);
+    if (oldAmount + Number(walletAmount) >= 100000000) {
       enqueueSnackbar("Cannot add amount more than 100000000", {
         variant: "warning",
         anchorOrigin: {
@@ -86,51 +88,60 @@ export default function Modal({ open, type, setOpen, transactionID }) {
     >
       {type === "Wallet Balance" ? (
         // Wallet modal
-        <div style={{ textAlign: "start", width: "100%" }}>
-          <h1 style={{ marginTop: "0" }}>Add Balance</h1>
-          <div style={{ display: "flex", gap: "15px" }}>
-            <input
-              type="number"
-              placeholder="Income Amount"
-              style={{
-                borderRadius: "15px",
-                border: "none",
-                padding: "10px",
-                boxShadow: "0 4px 4px rgba(0, 0, 0, 0.2)",
-              }}
-              onChange={updateAmount}
-              value={walletAmount}
-            />
-            <button
-              style={{
-                borderRadius: "15px",
-                border: "none",
-                padding: "15px",
-                background: "#F4BB4A",
-                cursor: "pointer",
-                color: "white",
-                boxShadow: "0 4px 4px rgba(0, 0, 0, 0.2)",
-                fontWeight: "600",
-              }}
-              onClick={updateWalletBalance}
-            >
-              Add Balance
-            </button>
-            <button
-              onClick={() => setOpen(false)}
-              style={{
-                borderRadius: "15px",
-                border: "none",
-                padding: "10px",
-                cursor: "pointer",
-                boxShadow: "0 4px 4px rgba(0, 0, 0, 0.2)",
-                fontWeight: "500",
-              }}
-            >
-              Cancel
-            </button>
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            updateWalletBalance();
+          }}
+        >
+          <div style={{ textAlign: "start", width: "100%" }}>
+            <h1 style={{ marginTop: "0" }}>Add Balance</h1>
+            <div style={{ display: "flex", gap: "15px" }}>
+              <input
+                type="number"
+                placeholder="Income Amount"
+                style={{
+                  borderRadius: "15px",
+                  border: "none",
+                  padding: "10px",
+                  boxShadow: "0 4px 4px rgba(0, 0, 0, 0.2)",
+                }}
+                onChange={updateAmount}
+                value={walletAmount}
+                required
+              />
+              <button
+                type="submit"
+                style={{
+                  borderRadius: "15px",
+                  border: "none",
+                  padding: "15px",
+                  background: "#F4BB4A",
+                  cursor: "pointer",
+                  color: "white",
+                  boxShadow: "0 4px 4px rgba(0, 0, 0, 0.2)",
+                  fontWeight: "600",
+                }}
+              >
+                Add Balance
+              </button>
+              <button
+                type="button"
+                onClick={() => setOpen(false)}
+                style={{
+                  borderRadius: "15px",
+                  border: "none",
+                  padding: "10px",
+                  cursor: "pointer",
+                  boxShadow: "0 4px 4px rgba(0, 0, 0, 0.2)",
+                  fontWeight: "500",
+                }}
+              >
+                Cancel
+              </button>
+            </div>
           </div>
-        </div>
+        </form>
       ) : (
         <ExpenseModal
           setOpen={setOpen}
