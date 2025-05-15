@@ -31,7 +31,7 @@ export default function Modal({ open, type, setOpen, transactionID }) {
       });
       return;
     }
-    if (oldAmount + walletAmount < expenses) {
+    if (oldAmount + Number(walletAmount) < expenses) {
       enqueueSnackbar(
         "The amount you are trying to add is lower than your expenses, please add more amount than expenses or lower your expenses",
         {
