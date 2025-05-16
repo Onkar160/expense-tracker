@@ -8,7 +8,7 @@ ReactModal.setAppElement("#root");
 
 export default function Modal({ open, type, setOpen, transactionID }) {
   const { enqueueSnackbar } = useSnackbar();
-  const { walletBalance, setWalletBalance, expenses } =
+  const { walletBalance, setWalletBalance } =
     useContext(Transactions);
   const [walletAmount, setWalletAmount] = useState("");
 
@@ -147,7 +147,7 @@ export default function Modal({ open, type, setOpen, transactionID }) {
           setOpen={setOpen}
           enqueueSnackbar={enqueueSnackbar}
           walletBalance={walletBalance}
-          expenses={expenses}
+          
           transactionID={transactionID}
           setWalletBalance={setWalletBalance}
         />
@@ -162,7 +162,7 @@ function ExpenseModal({
   setOpen,
   enqueueSnackbar,
   walletBalance,
-  expenses,
+  
   transactionID = "",
   setWalletBalance,
 }) {
@@ -173,12 +173,12 @@ function ExpenseModal({
     date: "",
   });
 
-  const { transactions, setTransactions } = useContext(Transactions);
+  const { expenses, setExpenses } = useContext(Transactions);
   // console.log(transactions);
 
   useEffect(() => {
     if (transactionID.length) {
-      const aTransaction = transactions.find((transaction) => {
+      const aTransaction = expenses.find((transaction) => {
         if (transaction.id === transactionID) {
           return transaction;
         }
@@ -195,7 +195,7 @@ function ExpenseModal({
 
   const editTransaction = (transactionID) => {
     // console.log(transactionID);
-    let oldTransaction = transactions.find((transaction) => {
+    let oldTransaction = expenses.find((transaction) => {
       if (transaction.id === transactionID) {
         return transaction;
       }
@@ -228,7 +228,7 @@ function ExpenseModal({
       );
       return;
     }
-    const editedTransactions = transactions.map((transaction) => {
+    const editedTransactions = expenses.map((transaction) => {
       if (transaction.id === transactionID) {
         transaction.title = expenseData.title;
         transaction.price = expenseData.price;
@@ -243,7 +243,7 @@ function ExpenseModal({
     currentBalance -= Number(expenseData.price);
     localStorage.setItem("walletBalance", currentBalance);
     setWalletBalance(currentBalance);
-    setTransactions(editedTransactions);
+    setExpenses(editedTransactions);
     setOpen(false);
     // console.log(editedTransactions);
   };
@@ -283,7 +283,7 @@ function ExpenseModal({
       return prevBalance - Number(expenseData.price);
     });
 
-    setTransactions((prevData) => {
+    setExpenses((prevData) => {
       return [...prevData, { id: uuidv4(), ...expenseData }];
     });
     setOpen(false);

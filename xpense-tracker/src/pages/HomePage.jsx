@@ -8,13 +8,13 @@ import BarChartSection from "../components/BarChartSection/BarChartSection";
 
 export default function HomePage() {
   const [walletBalance, setWalletBalance] = useState(0);
-  const [expenses, setExpenses] = useState(0);
-  const [transactions, setTransactions] = useState([]);
+  const [totalExpenses, setTotalExpenses] = useState(0);
+  const [expenses, setExpenses] = useState([]);
 
-  //For walletbalance and expenses
+  //For walletbalance and totalExpenses
   useEffect(() => {
     const walletBalance = localStorage.getItem("walletBalance");
-    const expenses = localStorage.getItem("expenses");
+    const totalExpenses = localStorage.getItem("totalExpenses");
     if (!walletBalance) {
       localStorage.setItem("walletBalance", 5000);
       setWalletBalance(5000);
@@ -22,57 +22,57 @@ export default function HomePage() {
       setWalletBalance(Number(walletBalance));
     }
 
-    if (!expenses) {
-      localStorage.setItem("expenses", 0);
-      setExpenses(0);
+    if (!totalExpenses) {
+      localStorage.setItem("totalExpenses", 0);
+      setTotalExpenses(0);
     } else {
-      setExpenses(Number(expenses));
+      setTotalExpenses(Number(totalExpenses));
     }
   }, []);
 
   //For transactions
   useEffect(() => {
     try {
-      const stored = JSON.parse(localStorage.getItem("transactions"));
+      const stored = JSON.parse(localStorage.getItem("expenses"));
       if (Array.isArray(stored)) {
-        setTransactions(stored);
+        setExpenses(stored);
       } else {
-        localStorage.setItem("transactions", JSON.stringify([]));
-        setTransactions([]);
+        localStorage.setItem("expenses", JSON.stringify([]));
+        setExpenses([]);
       }
     } catch (err) {
       console.error("Error parsing transactions from localStorage:", err);
-      localStorage.setItem("transactions", JSON.stringify([]));
-      setTransactions([]);
+      localStorage.setItem("expenses", JSON.stringify([]));
+      setExpenses([]);
     }
   }, []);
 
   useEffect(() => {
-    localStorage.setItem("transactions", JSON.stringify(transactions));
-  }, [transactions]);
+    localStorage.setItem("expenses", JSON.stringify(expenses));
+  }, [expenses]);
 
-  //For updating the total expenses price according to the transaction list change
+  //For updating the total totalExpenses price according to the transaction list change
   useEffect(() => {
-    if (transactions.length) {
-      let expenseAmount = transactions.reduce((acc, curr) => {
+    if (expenses.length) {
+      let expenseAmount = expenses.reduce((acc, curr) => {
         let amount = parseInt(curr.price);
         return acc + amount;
       }, 0);
       // console.log(expenseAmount);
-      localStorage.setItem("expenses", expenseAmount);
-      setExpenses(expenseAmount);
+      localStorage.setItem("totalExpenses", expenseAmount);
+      setTotalExpenses(expenseAmount);
     }
-  }, [transactions]);
+  }, [expenses]);
 
   return (
     <Transactions.Provider
       value={{
-        transactions,
-        setTransactions,
-        walletBalance,
-        setWalletBalance,
         expenses,
         setExpenses,
+        walletBalance,
+        setWalletBalance,
+        totalExpenses,
+        setTotalExpenses,
       }}
     >
       <SnackbarProvider maxSnack={3}>

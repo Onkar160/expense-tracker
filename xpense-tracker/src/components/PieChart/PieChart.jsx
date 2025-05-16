@@ -13,7 +13,7 @@ import { Transactions } from "../Context";
 const COLORS = ["#A000FF", "#FF9304", "#FDE006"];
 
 export default function CustomPieChart() {
-  const { transactions } = useContext(Transactions);
+  const { expenses } = useContext(Transactions);
   const [chartData, setChartData] = useState([
     { name: "Food", value: 0 },
     { name: "Entertainment", value: 0 },
@@ -54,7 +54,7 @@ export default function CustomPieChart() {
       travel: 0,
     };
 
-    transactions.forEach((transaction) => {
+    expenses.forEach((transaction) => {
       const categoryKey = transaction.category.toLowerCase();
       const amount = Number(transaction.price) || 0;
       if (categoryMap.hasOwnProperty(categoryKey)) {
@@ -67,7 +67,7 @@ export default function CustomPieChart() {
       { name: "Entertainment", value: categoryMap.entertainment },
       { name: "Travel", value: categoryMap.travel },
     ]);
-  }, [transactions]);
+  }, [expenses]);
 
   return (
     <div

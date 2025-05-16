@@ -7,14 +7,14 @@ import CustomPieChart from "../PieChart/PieChart";
 
 export default function SectionExpenseTracker() {
   // const {enqueueSnackbar} = useSnackbar();
-  const { walletBalance, expenses } = useContext(Transactions);
+  const { walletBalance, totalExpenses } = useContext(Transactions);
 
   return (
     <div className={styles.wrapper}>
       <h1 className={styles.heading}>Expense Tracker</h1>
       <div className={styles.expense_wrapper}>
         <AmountSection type={"Wallet Balance"} amount={walletBalance} />
-        <AmountSection type={"Expenses"} amount={expenses} />
+        <AmountSection type={"Expenses"} amount={totalExpenses} />
         <CustomPieChart />
       </div>
     </div>

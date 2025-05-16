@@ -6,32 +6,28 @@ import { MdOutlineEdit } from "react-icons/md";
 import EntertainmentIcon from "../../assets/entertainment.svg";
 import FoodIcon from "../../assets/food.svg";
 import TravelIcon from "../../assets/travel.svg";
-import { useSnackbar } from "notistack";
 import Modal from "../ReactModal/ReactModal";
 import { FaArrowLeftLong, FaArrowRightLong } from "react-icons/fa6";
 
 export default function RecentTransaction() {
   const {
-    transactions,
-    setTransactions,
-    walletBalance,
     expenses,
-    setWalletBalance,
     setExpenses,
+    setWalletBalance,
+    setTotalExpenses,
   } = useContext(Transactions);
 
   const [isOpen, setOpen] = useState(false);
-  const { enqueueSnackbar } = useSnackbar();
   const [selectedTransactionID, setSelectedTransactionID] = useState(null);
 
   // Pagination setup
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 4;
-  const totalPages = Math.ceil(transactions.length / itemsPerPage);
+  const totalPages = Math.ceil(expenses.length / itemsPerPage);
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentTransactions = transactions.slice(
+  const currentTransactions = expenses.slice(
     indexOfFirstItem,
     indexOfLastItem
   );
@@ -39,11 +35,11 @@ export default function RecentTransaction() {
   // Reset to page 1 when transactions change
   useEffect(() => {
     setCurrentPage(1);
-  }, [transactions]);
+  }, [expenses]);
 
   const deleteTransaction = (id) => {
     let transactionAmount = 0;
-    const newTransactions = transactions.filter((item) => {
+    const newTransactions = expenses.filter((item) => {
       if (id !== item.id) {
         return item;
       } else {
@@ -52,17 +48,17 @@ export default function RecentTransaction() {
     });
 
     let currentBalance = Number(localStorage.getItem("walletBalance"));
-    let currentExpense = Number(localStorage.getItem("expenses"));
+    let currentExpense = Number(localStorage.getItem("totalExpenses"));
 
     currentExpense -= transactionAmount;
     currentBalance += transactionAmount;
 
     localStorage.setItem("walletBalance", currentBalance);
-    localStorage.setItem("expenses", currentExpense);
+    localStorage.setItem("totalExpenses", currentExpense);
 
-    setExpenses(currentExpense);
+    setTotalExpenses(currentExpense);
     setWalletBalance(currentBalance);
-    setTransactions(newTransactions);
+    setExpenses(newTransactions);
   };
 
   const formatDate = (dateString) => {
@@ -85,8 +81,9 @@ export default function RecentTransaction() {
 
       <div className={styles.transactions_box}>
         <div>
-          {transactions.length ? (
+          {expenses.length ? (
             currentTransactions.map((transaction) => {
+              // console.log(typeof transaction.price);
               return (
                 <div className={styles.transaction} key={transaction.id}>
                   <div
@@ -167,7 +164,7 @@ export default function RecentTransaction() {
           )}
         </div>
         {/* Pagination */}
-        {transactions.length > itemsPerPage && (
+        {expenses.length > itemsPerPage && (
           <div
             style={{
               display: "flex",

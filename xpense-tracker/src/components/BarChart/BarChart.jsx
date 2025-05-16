@@ -10,7 +10,7 @@ import {
 import { Transactions } from "../Context";
 
 export default function AnimatedHorizontalBarChart() {
-  const { transactions } = useContext(Transactions);
+  const { expenses } = useContext(Transactions);
   const [chartData, setChartData] = useState([
     { name: "Entertainment", value: 0 },
     { name: "Food", value: 0 },
@@ -24,7 +24,7 @@ export default function AnimatedHorizontalBarChart() {
       travel: 0,
     };
 
-    transactions.forEach((transaction) => {
+    expenses.forEach((transaction) => {
       const categoryKey = transaction.category.toLowerCase();
       if (categoryMap.hasOwnProperty(categoryKey)) {
         categoryMap[categoryKey] += Number(transaction.price) || 0;
@@ -39,7 +39,7 @@ export default function AnimatedHorizontalBarChart() {
         { name: "Travel", value: categoryMap.travel },
       ]);
     }, 100); // Small delay triggers the animation from 0
-  }, [transactions]);
+  }, [expenses]);
 
   return (
     <div
